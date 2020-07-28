@@ -27,17 +27,14 @@ type Table = H.HashMap Val Val
 data Val = NilVal 
      | BoolVal Bool
      | IntVal Int 
-     | StrVal String    
-     {-
-     | FunVal [String] BlockStmt Env -- parameters, function body, closure env
-     -}
+     | StrVal String   
+     | PrimUnop (Val -> EvalState Val) 
+     | PrimBinop (Val -> Val -> EvalState Val)
      | TableVal Table   
-     | Void          
-    deriving (Eq, Typeable)
+    deriving (Typeable)
 
 instance Show Val where
   show NilVal = "nil"
-  show Void = ""
   show (TableVal table) = "{" ++ (show table) ++ "}"
   show (BoolVal b) = show b
   show (IntVal i) = show i 
@@ -54,35 +51,20 @@ instance Show Val where
 --- ### Expressions
 -- program expressions that can be evaluated to Val
 
-{-
-Unop:
-unary minus 
-unary bitwise NOT
-unary logical not
-unary length operator # 
-
-Binop: 
-arithmetic operators
-bitwise operators 
-relational operators
-logical operators 
-concatenation operator '..'
--}
 data Exp = NilExp
      | IntExp Int
      | BoolExp Bool
      | StrExp String -- literal string, simply evaluate to StrVal 
-     {-
+     | VarExp String  -- lookup variable name in environment  -- before first assignment to a variable, value is nil 
+     | UnopExp String Exp    
+     | BinopExp String Exp Exp 
+     | TableConstructor [(Exp,Exp)]  -- evaluate to a TableVal     
+     | TableLookUpExp Table Exp -- todo: lookup key in table 
+  deriving (Show)
+   {-
      | FunExp String [String] BlockStmt  -- function definition: name, parameters, function body. evaluatae to FunVal, also add to Penv, so Callstmt can use it(has side effects)
      | AppExp Exp [Exp] -- function call: todo: how to obtain return value from return statement 
      -}
-     | Unop String Exp    
-     | Binop String Exp Exp 
-     | VarExp String  -- lookup variable name in environment 
-              -- before first assignment to a variable, value is nil 
-     | TableConstructor [(Exp,Exp)]  -- evaluate to a TableVal     
-     | TableLookUpExp Table Exp -- todo: lookup key in table 
-  deriving (Show, Eq)
 
 --- ### Statements
 -- program statements that can be executed
@@ -91,21 +73,21 @@ data Exp = NilExp
 -- any value. Both false and nil test false. All values different 
 -- from nil and false test true. In particular, the number 0 and the empty string also test true.
 data Stmt = AssignStmt [String] [Exp] -- variable assignment, support multiple assignment
-          | AssignLocalStmt [String] [Exp] -- local varable declaration. scope within the block 
           | IfStmt [(Exp, Stmt)] Stmt -- conditional statements
           | BlockStmt [Stmt] -- sequence statements, act like semi-colon 
           | WhileStmt Exp Stmt -- while exp do block end 
           | RepeatStmt Stmt Exp -- repeat block until exp， condition exp can refer to local variables declared inside the loop block 
           | ForNumStmt String Exp Exp Exp -- numerical for loop 
-          {-
+          | PrintStmt Exp -- printing
+          | QuitStmt 
+    deriving (Show)
+{-
+          | AssignLocalStmt [String] [Exp] -- local varable declaration. scope within the block 
           -- procedure and call is equivalent to using function as statement. i.e. discard return value 
           | ProcedureStmt String [String] Stmt -- define precedure/function, add to Penv 
           | ReturnStmt [Exp]
           | CallStmt String [Exp] -- call function by name, with arguments. discard return value
                     -}
-          | PrintStmt Exp -- printing
-    deriving (Show, Eq)
-
 --- ### Diagnostic
 -- todo: 还没有改 
 data Diagnostic = UnexpectedArgs [Val]
