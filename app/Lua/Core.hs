@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts, DeriveGeneric  #-}
 
 module Lua.Core where
 
@@ -9,13 +9,17 @@ import Control.Monad.State
 import Control.Monad.Except
 import Data.Maybe
 
+import GHC.Generics (Generic)
+import Data.Hashable 
+
 
 --- ### Environment
 type Env = H.HashMap String Val
 
 --- ### Values
 -- primitive values of lua 
--- 6 basic types in Lua, omitted userdata, thread 
+-- 5 of 8 basic types in Lua: nil, boolean, number, string, table.
+--  omitted function, userdata, thread 
 -- values calculated during evaluation
 
 -- represent dictionary 
@@ -24,18 +28,30 @@ type Env = H.HashMap String Val
 -- part of the table. Conversely, any key that is not part of a 
 -- table has an associated value nil.
 type Table = H.HashMap Val Val 
-data Val = NilVal 
+
+data Val = NilVal  -- cannot be used as table index 
      | BoolVal Bool
      | IntVal Int 
      | StrVal String   
-     | PrimUnop (Val -> EvalState Val) 
-     | PrimBinop (Val -> Val -> EvalState Val)
      | TableVal Table   
-    deriving (Typeable)
+    deriving (Typeable, Generic, Eq)
 
+instance Hashable Val 
+
+{-
+instance Eq Val where  
+    NilVal      == NilVal           = True  
+    BoolVal b1  == BoolVal b2       = b1 == b2  
+    IntVal i1   == IntVal i2        = i1 == i2    
+    StrVal s1   == StrVal s2        = s1 == s2 
+    PrimUnop _  == PrimUnop _       = True 
+    PrimBinop _ == PrimBinop _      = True 
+    TableVal t1 == TableVal t2      = t1 == t2 
+    _           == _                = False 
+-}
 instance Show Val where
   show NilVal = "nil"
-  show (TableVal table) = "{" ++ (show table) ++ "}"
+  show (TableVal table) = "{" ++ (show table) ++ "}"  -- todo: modifies to the same format as croissant
   show (BoolVal b) = show b
   show (IntVal i) = show i 
   show (StrVal s) = show s 
@@ -59,7 +75,7 @@ data Exp = NilExp
      | UnopExp String Exp    
      | BinopExp String Exp Exp 
      | TableConstructor [(Exp,Exp)]  -- evaluate to a TableVal     
-     | TableLookUpExp Table Exp -- todo: lookup key in table 
+     | TableLookUpExp Exp Exp -- take a VarExp that evaluate to a TableVal and key expression
   deriving (Show)
    {-
      | FunExp String [String] BlockStmt  -- function definition: name, parameters, function body. evaluatae to FunVal, also add to Penv, so Callstmt can use it(has side effects)
@@ -72,7 +88,8 @@ data Exp = NilExp
 -- The condition expression of a control structure can return 
 -- any value. Both false and nil test false. All values different 
 -- from nil and false test true. In particular, the number 0 and the empty string also test true.
-data Stmt = AssignStmt [String] [Exp] -- variable assignment, support multiple assignment
+data Stmt = AssignStmt [Exp] [Exp] -- variable assignment, support multiple assignment
+          | TableAssignStmt Exp Exp Exp -- t[key] = val 
           | IfStmt [(Exp, Stmt)] Stmt -- conditional statements
           | BlockStmt [Stmt] -- sequence statements, act like semi-colon 
           | WhileStmt Exp Stmt -- while exp do block end 

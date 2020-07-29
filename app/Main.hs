@@ -30,8 +30,8 @@ repl env = do
       case runExcept $ runStateT (exec s) env of   -- Eval
         Left err              -> print err
         -- Otherwise, print and loop with new env
-        Right (output, new_env)    -> do printLn $ show output
+        Right (output, new_env)    -> do printLn output
                                          repl new_env
 
 main :: IO ()
-main = repl runtime
+main = repl H.empty
