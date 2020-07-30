@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleContexts #-}
 module Lua.Parse where
 
 import Lua.Core

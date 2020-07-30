@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleContexts, DeriveGeneric  #-}
-
 module Lua.Core where
 
 import Prelude hiding (lookup)
@@ -90,14 +88,17 @@ data Exp = NilExp
 -- from nil and false test true. In particular, the number 0 and the empty string also test true.
 data Stmt = AssignStmt [Exp] [Exp] -- variable assignment, support multiple assignment
           | TableAssignStmt Exp Exp Exp -- t[key] = val 
-          | IfStmt [(Exp, Stmt)] Stmt -- conditional statements
+          | PrintStmt Exp -- printing
+          | QuitStmt 
+    deriving (Show)
+
+{-
+  | IfStmt [(Exp, Stmt)] Stmt -- conditional statements
           | BlockStmt [Stmt] -- sequence statements, act like semi-colon 
           | WhileStmt Exp Stmt -- while exp do block end 
           | RepeatStmt Stmt Exp -- repeat block until exp， condition exp can refer to local variables declared inside the loop block 
           | ForNumStmt String Exp Exp Exp -- numerical for loop 
-          | PrintStmt Exp -- printing
-          | QuitStmt 
-    deriving (Show)
+-}
 {-
           | AssignLocalStmt [String] [Exp] -- local varable declaration. scope within the block 
           -- procedure and call is equivalent to using function as statement. i.e. discard return value 

@@ -21,6 +21,7 @@ printLn str = hPutStrLn stdout str >> hFlush stdout
 repl :: Env -> IO ()
 repl env = do
   putStr "Lua> "
+  hFlush stdout
   l <- getLine                                        -- Read
   case parse stmt "stdin" l of                  -- Parse
     Left err -> print err  -- Diagnostics

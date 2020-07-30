@@ -1,4 +1,3 @@
-{-# LANGUAGE FlexibleContexts, LambdaCase #-}
 
 module Lua.Eval where
 
@@ -82,11 +81,11 @@ exec (AssignStmt keyExpList valExpList) = do
 exec (TableAssignStmt e1@(VarExp tableName) e2 e3) = do 
       oldTableVal <- eval e1 
       case oldTableVal of 
-        (TableVal oldTable) ->do keyVal   <- eval e2 
-                                 newVal   <- eval e3 
-                                 let newTable = H.insert keyVal newVal oldTable
-                                 modify $ H.insert tableName (TableVal newTable)
-                                 return ""
+        (TableVal oldTable) -> do keyVal   <- eval e2 
+                                  newVal   <- eval e3 
+                                  let newTable = H.insert keyVal newVal oldTable
+                                  modify $ H.insert tableName (TableVal newTable)
+                                  return ""
         _                   -> return "attempting to index a value that's not a table."
                                 
 
