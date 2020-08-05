@@ -31,7 +31,7 @@ data Val = NilVal  -- cannot be used as table index
      | BoolVal Bool
      | IntVal Int 
      | StrVal String   
-     | TableVal Table   
+     | TableVal Table  
     deriving (Typeable, Generic, Eq)
 
 instance Hashable Val 
@@ -53,6 +53,7 @@ instance Show Val where
   show (BoolVal b) = show b
   show (IntVal i) = show i 
   show (StrVal s) = show s 
+  show (ErrorVal) = "error"
   
   --show (_ i) = show i  -- Bool, Int, String
   {-
@@ -106,43 +107,7 @@ data Stmt = AssignStmt [Exp] [Exp] -- variable assignment, support multiple assi
           | ReturnStmt [Exp]
           | CallStmt String [Exp] -- call function by name, with arguments. discard return value
                     -}
---- ### Diagnostic
--- todo: 还没有改 
-data Diagnostic = UnexpectedArgs [Val]
-                | NotFuncError Val
-                | UndefSymbolError String
-                | NotArgumentList Val
-                | InvalidSpecialForm String Val
-                | CannotApply Val [Val]
-                | InvalidExpression Val
-                | NotASymbol Val
-                | NotAListOfTwo Val
-                | UnquoteNotInQuasiquote Val
-                | Unimplemented String
-instance Show Diagnostic where
-  show (UnexpectedArgs actual) =
-    "Error: Unexpected arguments or wrong number of arguments (" ++ unwords (map show actual) ++ ")"
-  show (NotFuncError val) =
-    "Error: " ++ show val ++ " is not a function"
-  show (UndefSymbolError name) =
-    "Error: Symbol " ++ name ++ " is undefined"
-  show (NotArgumentList val) =
-    "Error: Expecting an argument list, but found " ++ show val
-  show (InvalidSpecialForm f val) =
-    "Error: Invalid pattern in special form `" ++ f ++ "`: " ++ show val
-  show (CannotApply val args) =
-    "Error: Cannot apply " ++ show val ++ " on argument list (" ++ unwords (map show args) ++ ")"
-  show (InvalidExpression val) =
-    "Error: Invalid expression: " ++ show val
-  show (NotASymbol val) =
-    "Error: Not a symbol: " ++ show val
-  show (NotAListOfTwo val) =
-    "Error: Not a list of two elements: " ++ show val
-  show (UnquoteNotInQuasiquote val) =
-    "Error: `unquote` not in a `quasiquote` context: " ++ show val
-  show (Unimplemented feature) =
-    "Error: " ++ feature ++ " is not implemented. You should implement it first!"
 
--- state may need to be (Penv and Env)
--- can i put both in the same hashmap ? 
-type EvalState a = StateT Env (Except Diagnostic) a
+
+ 
+type EvalState a = State Env a

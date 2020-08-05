@@ -24,15 +24,11 @@ repl env = do
   hFlush stdout
   l <- getLine                                        -- Read
   case parse stmt "stdin" l of                  -- Parse
-    Left err -> print err  -- Diagnostics
+    Left err       -> print err  -- Diagnostics
     Right QuitStmt -> printLn "bye"                        
-    Right s ->
-        -- runExcept returns a value of type `Either Diagnostic (Val, Env)`
-      case runExcept $ runStateT (exec s) env of   -- Eval
-        Left err              -> print err
-        -- Otherwise, print and loop with new env
-        Right (output, new_env)    -> do printLn output
-                                         repl new_env
+    Right s        -> printLn output
+                      repl new_env
+                      where (output, new_env) = runStateT (exec s) env
 
 main :: IO ()
 main = repl H.empty
