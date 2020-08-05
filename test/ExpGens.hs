@@ -3,6 +3,7 @@ module ExpGens where
 import Test.QuickCheck
 
 import qualified Data.HashMap.Strict as H
+import Lua.Core
 
 --- eval
 --- ----
@@ -14,7 +15,7 @@ data ExpValUnit = ExpValUnit Exp Val
 --- ### Constants
 
 arbConstExp :: Gen ExpValUnit
-arbConstExp = oneof [ (ExpValUnit <$> NilExp  <*>  NilVal) <$> arbitrary
-					, (ExpValUnit <$> IntExp  <*>  IntVal) <$> arbitrary
+-- todo: how to test for NilExp and NilVal?  
+arbConstExp = oneof [ (ExpValUnit <$> IntExp  <*>  IntVal) <$> arbitrary
                     , (ExpValUnit <$> BoolExp <*> BoolVal) <$> arbitrary 
                     , (ExpValUnit <$> StrExp  <*>  StrVal) <$> arbitrary ]

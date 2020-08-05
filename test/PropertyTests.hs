@@ -7,15 +7,11 @@ where
 
 import Test.QuickCheck
 import qualified Data.HashMap.Strict as H
-
+import Control.Monad.State
 import Lua.Eval
 
 import ExpGens
 
-
-isException :: Val -> Bool
-isException (ExnVal _) = True
-isException         _  = False
 
 -- classify :: Bool -> String -> Property -> Property
 -- counterexample :: Testable prop => String -> prop -> Property
@@ -23,10 +19,9 @@ isException         _  = False
 
 anyExpVal_prop :: ExpValUnit -> Property
 anyExpVal_prop (ExpValUnit e v)
-    = classify (isException v) "Exception"
-      $ showFailure $ actualResult === v
+    = showFailure $ actualResult === v
   where
-    actualResult, _ = runState (eval e) H.empty
+    (actualResult, _) = runState (eval e) H.empty
     showFailure = counterexample $ "eval failed on"
                   ++"\nexpression: '"++show e
                   ++"'.\nExpected: '"++show v

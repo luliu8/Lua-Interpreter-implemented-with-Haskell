@@ -28,13 +28,14 @@ eval (BinopExp op e1 e2) = do v1 <- eval e1
                               v2 <- eval e2   
                               case H.lookup op runtime of 
                                 Just (PrimBinop f)  -> f v1 v2
-                                -                   -> return "invalid operator" 
-                                
+                                Just _              -> return $ StrVal "invalid operator" 
+                                Nothing             -> return $ StrVal "invalid operator" 
                     
 eval (UnopExp op e) = do v <- eval e
                          case H.lookup op runtime of 
                           Just (PrimUnop f)  -> f v
-                          -                  -> return "invalid operator" 
+                          Just _             -> return $ StrVal "invalid operator" 
+                          Nothing            -> return $ StrVal "invalid operator" 
 
 
 
@@ -49,7 +50,7 @@ eval (TableLookUpExp varExp keyExp) =
            TableVal t -> case H.lookup keyVal t of 
                           Just v  -> return v
                           Nothing -> return NilVal
-           _          -> return "attempting to index a value that's not a table." 
+           _          -> return $ StrVal "attempting to index a value that's not a table." 
 
 {-
 the list of values is adjusted to the length of the list of variables. 

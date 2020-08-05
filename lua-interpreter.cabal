@@ -27,7 +27,7 @@ source-repository head
 
 library
   other-modules:
-      Main , Lua.Core , Lua.Eval , Lua.Parse , Lua.Runtime 
+      Lua.Core , Lua.Eval , Lua.Parse , Lua.Runtime 
   hs-source-dirs:
       app
   build-depends:
@@ -39,7 +39,7 @@ library
 executable main
   main-is: Main.hs
   other-modules:
-      Main , Lua.Core , Lua.Eval , Lua.Parse , Lua.Runtime  
+      Lua.Core , Lua.Eval , Lua.Parse , Lua.Runtime  
   hs-source-dirs:
       app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
@@ -53,10 +53,9 @@ test-suite test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Lua.Core , Lua.Eval , Lua.Parse , Lua.Runtime , Spec
-    , ExpGens, PropertyTests  
+      ExpGens, PropertyTests, Lua.Core, Lua.Eval, Lua.Runtime, Lua.Parse
   hs-source-dirs:
-      app, test
+      test, app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5

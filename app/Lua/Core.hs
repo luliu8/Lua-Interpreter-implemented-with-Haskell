@@ -53,7 +53,6 @@ instance Show Val where
   show (BoolVal b) = show b
   show (IntVal i) = show i 
   show (StrVal s) = show s 
-  show (ErrorVal) = "error"
   
   --show (_ i) = show i  -- Bool, Int, String
   {-
@@ -75,7 +74,7 @@ data Exp = NilExp
      | BinopExp String Exp Exp 
      | TableConstructor [(Exp,Exp)]  -- evaluate to a TableVal     
      | TableLookUpExp Exp Exp -- take a VarExp that evaluate to a TableVal and key expression
-  deriving (Show)
+  deriving (Eq, Show)
    {-
      | FunExp String [String] BlockStmt  -- function definition: name, parameters, function body. evaluatae to FunVal, also add to Penv, so Callstmt can use it(has side effects)
      | AppExp Exp [Exp] -- function call: todo: how to obtain return value from return statement 
@@ -91,7 +90,7 @@ data Stmt = AssignStmt [Exp] [Exp] -- variable assignment, support multiple assi
           | TableAssignStmt Exp Exp Exp -- t[key] = val 
           | PrintStmt Exp -- printing
           | QuitStmt 
-    deriving (Show)
+    deriving (Eq, Show)
 
 {-
   | IfStmt [(Exp, Stmt)] Stmt -- conditional statements
