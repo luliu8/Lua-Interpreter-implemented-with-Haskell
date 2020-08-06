@@ -132,7 +132,6 @@ unary operators (not   #     -     ~)
 -}
 
 -- fun should be Exp -> Exp -> Exp 
--- Todo: add function signature 
 binary  name fun assoc = Infix (do{ symbol name; return fun }) assoc
 prefix  name fun       = Prefix (do{ symbol name; return fun })
 table = [ [binary "^" (BinopExp "^") AssocRight]
@@ -178,14 +177,27 @@ tableAssignStmt = do e1 <- varExp
                      symbol "="
                      e3 <- expr 
                      return $ TableAssignStmt e1 e2 e3 
+{-
+parseStmt :: String -> Stmt 
+parseStmt l = case parse stmt "" l of 
+                Left err       -> print err  -- Diagnostics
+                Right s        -> s 
+-}
+seqStmt :: Parser Stmt 
+seqStmt = do symbol "do"
+             stmtList <- stmt `sepBy` (symbol ";")  --如果没有分号 会不会也被parse成一个list  [stmt]
+             symbol "end"
+             return $ SeqStmt stmtList
+
 
 
 
 stmt :: Parser Stmt
-stmt =  quitStmt 
-    <|> printStmt
+stmt =  try quitStmt 
+    <|> try printStmt
     <|> try tableAssignStmt 
     <|> try assignStmt 
+    <|> seqStmt 
 
 {-
 stmt = 

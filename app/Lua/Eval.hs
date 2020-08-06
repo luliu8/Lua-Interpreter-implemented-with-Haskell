@@ -16,14 +16,19 @@ evalPair (e1, e2) = do v1 <- eval e1
 
 -- ### The monadic evaluator
 eval :: Exp -> EvalState Val
+-- constant expressons 
 eval NilExp = return NilVal 
 eval (IntExp i) = return $ IntVal i
 eval (BoolExp b) = return $ BoolVal b 
 eval (StrExp s) = return $ StrVal s 
+
+-- variable expression 
 eval (VarExp k) = do env <- get 
                      case H.lookup k env of 
                         Just v  -> return v
                         Nothing -> return NilVal
+
+-- binary operations 
 eval (BinopExp op e1 e2) = do v1 <- eval e1
                               v2 <- eval e2   
                               case H.lookup op runtime of 
@@ -31,6 +36,7 @@ eval (BinopExp op e1 e2) = do v1 <- eval e1
                                 Just _              -> return $ StrVal "invalid operator" 
                                 Nothing             -> return $ StrVal "invalid operator" 
                     
+-- unary operations 
 eval (UnopExp op e) = do v <- eval e
                          case H.lookup op runtime of 
                           Just (PrimUnop f)  -> f v
@@ -39,7 +45,7 @@ eval (UnopExp op e) = do v <- eval e
 
 
 
-
+-- table expressions  
 eval (TableConstructor fieldExpList) = do fieldValList <- mapM evalPair fieldExpList
                                           return $ TableVal $ H.fromList fieldValList
 
@@ -85,4 +91,5 @@ exec (TableAssignStmt e1@(VarExp tableName) e2 e3) = do
                                   return ""
         _                   -> return "attempting to index a value that's not a table."
                                 
-
+exec (SeqStmt xs) = do outputs <- mapM exec xs
+                       return $ unlines $ filter (/="") outputs  

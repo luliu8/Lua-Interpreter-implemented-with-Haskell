@@ -89,6 +89,7 @@ data Exp = NilExp
 data Stmt = AssignStmt [Exp] [Exp] -- variable assignment, support multiple assignment
           | TableAssignStmt Exp Exp Exp -- t[key] = val 
           | PrintStmt Exp -- printing
+          | SeqStmt [Stmt] -- a sequence of statements to be executed 
           | QuitStmt 
     deriving (Eq, Show)
 

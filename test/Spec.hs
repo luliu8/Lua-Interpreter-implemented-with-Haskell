@@ -11,10 +11,18 @@ import PropertyTests
 main :: IO ()    
 main = putStrLn "" >> defaultMain tests
 
-tests = testGroup "Property Tests"
+tests = testGroup "end to end Property Tests"
   [ testGroup "eval Function"
     [ testProperty
       "Constant Expressions"
       $ forAll arbConstExp anyExpVal_prop
+
+    , testProperty
+      "Variable Expressions"
+      $ forAll arbVarExp anyExpEnvVal_prop
+
+    , testProperty
+      "Binary Operation Expressions"
+      $ forAll (arbIntOpExp 3)  anyExpVal_prop
     ]
   ]
