@@ -10,20 +10,21 @@ import Lua.Runtime
 
 import Text.ParserCombinators.Parsec hiding (Parser, State)
 
-
+-- parse a line of code and execute 
+parseExecTest :: String -> String 
+parseExecTest l = case parse stmt "test" l of                 
+    Left err       -> show err 
+    Right s        -> let (result, _) = runState (exec s) H.empty
+                      in result 
 
 data CodeResultUnit = CodeResultUnit String String 
   deriving(Show, Eq) 
-
 
 anyCodeResult_prop :: CodeResultUnit -> Property
 anyCodeResult_prop (CodeResultUnit code result)
     = showFailure $ actualResult === result
         where
-          actualResult = case parse stmt "" code of 
-                            Left err -> show err 
-                            Right s  -> let (output, _) = runState (exec s) H.empty
-                                        in output 
+          actualResult = parseExecTest code 
           showFailure = counterexample $ "failed on"
                         ++"\ncode: '"++show code
                         ++"'.\nExpected: '"++show result
@@ -31,7 +32,9 @@ anyCodeResult_prop (CodeResultUnit code result)
 
 
 
--- ### constant expressions : nil, true/false, int, String 
+-- ### constant expressions : nil, true/false, int, String
+-- generate random code string such as print (true), print ("abc")
+ 
 arbInt :: Gen CodeResultUnit 
 arbInt = do int <- arbitrary :: Gen Int
             let code = "print ("++ show int ++ ")"

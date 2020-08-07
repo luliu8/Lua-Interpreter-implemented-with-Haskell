@@ -100,19 +100,19 @@ tableLookUpExp = do t <- var
 
 
 expr :: Parser Exp
-expr = try atom <|> buildExpressionParser table atom <?> "expression"
+expr = try (buildExpressionParser table atom)  <|> atom <?> "expression"
 
 
 
 atom :: Parser Exp
-atom = nilExp 
+atom = try nilExp 
    <|> intExp
    <|> try boolExp  
-   <|> try tableLookUpExp
-   <|> try strExp 
+   <|> tableLookUpExp
+   <|> strExp 
    <|> parens expr
    <|> tableConstructor 
-   <|> try varExp
+   <|> varExp
 
 
 {-
