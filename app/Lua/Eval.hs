@@ -50,7 +50,7 @@ eval (TableConstructor fieldExpList) = do fieldValList <- mapM evalPair fieldExp
                                           return $ TableVal $ H.fromList fieldValList
 
 eval (TableLookUpExp varExp keyExp) = 
-      do keyVal <- eval keyExp --todo: report error when keyVal is NilVal 
+      do keyVal <- eval keyExp  
          tableVal <- eval varExp 
          case tableVal of 
            TableVal t -> case H.lookup keyVal t of 

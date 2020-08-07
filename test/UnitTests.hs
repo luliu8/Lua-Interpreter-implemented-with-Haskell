@@ -4,7 +4,6 @@ import Data.HashMap.Strict as H
 import Test.Tasty.HUnit
 import PropertyTests (parseExecTest)
 
--- Operator expressions 
 intOpExpUnitTests :: [(String, Assertion)]
 intOpExpUnitTests =
   [ ( "^"
@@ -113,3 +112,39 @@ logicOpExpUnitTests =
       "true\n99\n" (parseExecTest "do print (3 and false or nil ~= 3); print (99 or false == false and nil) end")
     )
   ]
+
+
+assignVarUnitTests :: [(String, Assertion)]
+assignVarUnitTests =
+  [ ( "single assignment"
+    , assertEqual ""
+      "4\nfalse\nnil\n99\n" 
+      (parseExecTest "do a = 1+3; b = 33 and false; print (a); print (b); b = 99; print (c); print(b) end")
+    )
+  , ( "multiple assignment"
+    , assertEqual ""
+      "nil\n16\nabc\n" 
+      (parseExecTest "do a,b,c = 3*5+1, \"abc\" ; print (c); print(a); print(b) end")
+    )
+  ]
+
+tableUnitTests :: [(String, Assertion)]
+tableUnitTests =
+  [ ( "table constructor"
+    , assertEqual ""
+      "true\nnil\n{fromList [(3,true),(1,99),(x,abc)]}\n" 
+      (parseExecTest "do t = {[1] = 99, [\"x\"]=\"abc\", [#\"key\"]=true}; print (t[3]);print(t[0]);print (t) end")
+    ) 
+
+  , ( "table assignment and lookup"
+    , assertEqual ""
+      "99\nnil\n{fromList [(1,99),(x,true)]}\n" 
+      (parseExecTest "do t = {}; t[1] = 99; t[\"x\"] = true; print (t[1]); print (t[0]); print (t) end")
+    )
+  ]
+
+
+
+
+
+

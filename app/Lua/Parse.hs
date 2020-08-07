@@ -10,9 +10,7 @@ import Text.Parsec.Expr
 import Control.Monad
 
 
-{-
-second parameter which in the real world would be the name of the file whose contents you are parsing, and is just used in error messages by Parsec to give you that piece of extra information
--}
+
 type Parser = ParsecT String () Identity
 
 -- Lexicals 
@@ -38,16 +36,6 @@ var = do v <- many1 letter <?> "an identifier"
          spaces
          return v
 
-
-
-{-
-data Exp = 
-     | UnopExp String Exp    
-     | BinopExp String Exp Exp  
-     | TableConstructor [(Exp,Exp)]  -- evaluate to a TableVal     
-     | TableLookUpExp Table Exp -- todo: lookup key in table 
-  deriving (Show, Eq)
--}
 
 -- Expressions
 nilExp :: Parser Exp 
@@ -108,7 +96,7 @@ atom :: Parser Exp
 atom = try nilExp 
    <|> intExp
    <|> try boolExp  
-   <|> tableLookUpExp
+   <|> try tableLookUpExp
    <|> strExp 
    <|> parens expr
    <|> tableConstructor 
@@ -143,18 +131,7 @@ table = [ [binary "^" (BinopExp "^") AssocRight]
         , [binary "and" (BinopExp "and") AssocLeft]
         , [binary "or" (BinopExp "or") AssocLeft]]
 
-{-
---- ### Statements
-data Stmt = AssignStmt [String] [Exp] -- variable assignment, support multiple assignment
-          | IfStmt [(Exp, Stmt)] Stmt -- conditional statements
-          | BlockStmt [Stmt] -- sequence statements, act like semi-colon 
-          | WhileStmt Exp Stmt -- while exp do block end 
-          | RepeatStmt Stmt Exp -- repeat block until exp， condition exp can refer to local variables declared inside the loop block 
-          | ForNumStmt String Exp Exp Exp -- numerical for loop 
-          | PrintStmt Exp -- printing
-          | AssignLocalStmt [String] [Exp] -- local varable declaration. scope within the block 
-    deriving (Show, Eq)
--}
+
 printStmt :: Parser Stmt
 printStmt = do symbol "print"
                e <- parens expr 
@@ -177,15 +154,10 @@ tableAssignStmt = do e1 <- varExp
                      symbol "="
                      e3 <- expr 
                      return $ TableAssignStmt e1 e2 e3 
-{-
-parseStmt :: String -> Stmt 
-parseStmt l = case parse stmt "" l of 
-                Left err       -> print err  -- Diagnostics
-                Right s        -> s 
--}
+
 seqStmt :: Parser Stmt 
 seqStmt = do symbol "do"
-             stmtList <- stmt `sepBy` (symbol ";")  --如果没有分号 会不会也被parse成一个list  [stmt]
+             stmtList <- stmt `sepBy` (symbol ";") 
              symbol "end"
              return $ SeqStmt stmtList
 
@@ -199,10 +171,3 @@ stmt =  try quitStmt
     <|> try assignStmt 
     <|> seqStmt 
 
-{-
-stmt = 
-   <|> printStmt
-   <|> ifStmt
-   <|> blockStmt
-   <|> try setStmt
-   -}

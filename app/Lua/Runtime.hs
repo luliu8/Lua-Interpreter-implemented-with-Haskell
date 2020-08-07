@@ -24,7 +24,7 @@ liftIntBinop :: (Int-> Int-> Int) -> Val -> Val -> EvalState Val -- PrimBinop (V
 liftIntBinop f = p where
     p v1 v2 = return $ IntVal $ f (lowerInt v1) (lowerInt v2)
 
-liftIntUnop :: (Int-> Int)->Val -> EvalState Val -- PrimUnop (Val -> EvalState Val) 
+liftIntUnop :: (Int-> Int)-> Val -> EvalState Val -- PrimUnop (Val -> EvalState Val) 
 liftIntUnop f = p where
     p v = return $ IntVal $ f $ lowerInt v 
 
@@ -43,14 +43,13 @@ to_str (StrVal s) = s
 luaConcat :: Val -> Val -> EvalState Val
 luaConcat v1 v2 = return $ StrVal $ to_str(v1) ++ to_str(v2)
 
--- both false and nil as false and anything else as true
  
 
-{-
+{- Eq and InEq 
 If the types are different, then the result is false. 
 Otherwise, the values of the operands are compared. 
 Strings are equal if they have the same byte content. 
-Numbers are equal if they denote the same mathematical value.                     , ("~=", liftIntBinop (/=)) 
+Numbers are equal if they denote the same mathematical value. 
 
 Tables are compared by reference. (not supported here)
 -}

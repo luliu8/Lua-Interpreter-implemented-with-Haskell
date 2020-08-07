@@ -38,11 +38,9 @@ unitTests = testGroup "Unit Tests"
       , testGroup "Logical Operator Expressions"
         $ buildTestCase logicOpExpUnitTests
       ]
-  ]
-  {-
   , testGroup "Assignment and Variable Expressions"
         $ buildTestCase assignVarUnitTests
   , testGroup "Table Manipulations"
-        $ buildTestCase intOpExpUnitTests
+        $ buildTestCase tableUnitTests
   ]
-  -}
+ 
