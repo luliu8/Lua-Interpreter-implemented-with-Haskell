@@ -100,7 +100,7 @@ tableLookUpExp = do t <- var
 
 
 expr :: Parser Exp
-expr = buildExpressionParser table atom <?> "expression"
+expr = try atom <|> buildExpressionParser table atom <?> "expression"
 
 
 
@@ -130,12 +130,12 @@ and
 unary operators (not   #     -     ~)
 ^
 -}
-
+--  
 -- fun should be Exp -> Exp -> Exp 
 binary  name fun assoc = Infix (do{ symbol name; return fun }) assoc
 prefix  name fun       = Prefix (do{ symbol name; return fun })
 table = [ [binary "^" (BinopExp "^") AssocRight]
-        , [prefix op (UnopExp op) | op <- ["not", "#", "-"]]
+        , [prefix op (UnopExp ("unop"++op)) | op <- ["not", "#", "-"]]
         , [binary op (BinopExp op) AssocLeft | op <- ["*","/","//","%"]]
         , [binary op (BinopExp op) AssocLeft | op <- ["+","-"]]
         , [binary ".." (BinopExp "..") AssocRight]
@@ -156,12 +156,12 @@ data Stmt = AssignStmt [String] [Exp] -- variable assignment, support multiple a
     deriving (Show, Eq)
 -}
 printStmt :: Parser Stmt
-printStmt = do try $ symbol "print"
+printStmt = do symbol "print"
                e <- parens expr 
                return $ PrintStmt e
 
 quitStmt :: Parser Stmt
-quitStmt = do try $ symbol "quit"
+quitStmt = do symbol "quit"
               return QuitStmt
 
 assignStmt :: Parser Stmt 

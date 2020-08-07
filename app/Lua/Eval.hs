@@ -33,15 +33,15 @@ eval (BinopExp op e1 e2) = do v1 <- eval e1
                               v2 <- eval e2   
                               case H.lookup op runtime of 
                                 Just (PrimBinop f)  -> f v1 v2
-                                Just _              -> return $ StrVal "invalid operator" 
-                                Nothing             -> return $ StrVal "invalid operator" 
+                                Just _              -> return $ StrVal "not a Binary operator" 
+                                Nothing             -> return $ StrVal "operator doesn't exist" 
                     
 -- unary operations 
 eval (UnopExp op e) = do v <- eval e
                          case H.lookup op runtime of 
                           Just (PrimUnop f)  -> f v
-                          Just _             -> return $ StrVal "invalid operator" 
-                          Nothing            -> return $ StrVal "invalid operator" 
+                          Just _             -> return $ StrVal "not a Unary operator" 
+                          Nothing            -> return $ StrVal "operator doesn't exist" 
 
 
 

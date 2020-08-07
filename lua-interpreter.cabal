@@ -53,7 +53,7 @@ test-suite test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      ExpGens, PropertyTests, Lua.Core, Lua.Eval, Lua.Runtime, Lua.Parse
+      PropertyTests, Lua.Core, Lua.Eval, Lua.Runtime, Lua.Parse
   hs-source-dirs:
       test, app
   ghc-options: -threaded -rtsopts -with-rtsopts=-N

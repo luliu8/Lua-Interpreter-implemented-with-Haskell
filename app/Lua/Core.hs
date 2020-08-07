@@ -50,9 +50,9 @@ instance Eq Val where
 instance Show Val where
   show NilVal = "nil"
   show (TableVal table) = "{" ++ (show table) ++ "}"  -- todo: modifies to the same format as croissant
-  show (BoolVal b) = show b
+  show (BoolVal b) = if b == True then "true" else "false"
   show (IntVal i) = show i 
-  show (StrVal s) = show s 
+  show (StrVal s) =  s 
   
   --show (_ i) = show i  -- Bool, Int, String
   {-

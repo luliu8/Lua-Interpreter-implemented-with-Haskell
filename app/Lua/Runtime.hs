@@ -102,7 +102,7 @@ runtime :: PrimFuncEnv
 -- map (String : PrimBinop/PrimUnop)
 runtime = H.fromList [ ("^", PrimBinop $ liftIntBinop (^))
                      , ("#", PrimUnop $ liftStrUnop length)
-                     , ("-", PrimUnop $ liftIntUnop negate )
+                     , ("unop-", PrimUnop $ liftIntUnop negate )
                      , ("*", PrimBinop $ liftIntBinop (*))
                      , ("/", PrimBinop $ liftIntBinop div)
                      , ("//", PrimBinop $ liftIntBinop div)  -- todo: doesnt support float, so both division perform the same 
