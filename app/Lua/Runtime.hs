@@ -55,6 +55,7 @@ Numbers are equal if they denote the same mathematical value.                   
 Tables are compared by reference. (not supported here)
 -}
 luaEq :: Val -> Val -> EvalState Val 
+luaEq NilVal NilVal = return $ BoolVal True
 luaEq (IntVal i1) (IntVal i2) = return $ BoolVal (i1 == i2)
 luaEq (BoolVal b1) (BoolVal b2) = return $ BoolVal (b1 == b2)
 luaEq (StrVal s1) (StrVal s2) = return $ BoolVal (s1 == s2)
@@ -106,7 +107,6 @@ intOps = [ ("^", PrimBinop $ liftIntBinop (^))
          , ("unop-", PrimUnop $ liftIntUnop negate )
          , ("*", PrimBinop $ liftIntBinop (*))
          , ("/", PrimBinop $ liftIntBinop div)
-         , ("//", PrimBinop $ liftIntBinop div)  -- todo: doesnt support float, so both division perform the same 
          , ("%", PrimBinop $ liftIntBinop mod)
          , ("+", PrimBinop $ liftIntBinop (+))
          , ("-", PrimBinop $ liftIntBinop (-))]
@@ -118,11 +118,11 @@ boolOps = [ ("<", PrimBinop $ liftBoolBinop (<))
           , (">=", PrimBinop $ liftBoolBinop (>=))]
                    
 strOps :: [(String, PrimFunc)]
-strOps = [ ("#", PrimUnop $ liftStrUnop length)
+strOps = [ ("unop#", PrimUnop $ liftStrUnop length)
          , ("..", PrimBinop luaConcat)]
 
 logicalEqOps :: [(String, PrimFunc)]
-logicalEqOps = [("not", PrimUnop luaNot)
+logicalEqOps = [("unopnot", PrimUnop luaNot)
                , ("~=", PrimBinop luaIneq)
                , ("==", PrimBinop luaEq)
                , ("and", PrimBinop luaAnd)
@@ -131,7 +131,7 @@ logicalEqOps = [("not", PrimUnop luaNot)
 
 runtime :: PrimFuncEnv
 -- map (String : PrimBinop/PrimUnop)
-runtime = H.fromList $ intOps ++ boolOps ++ logicalEqOps
+runtime = H.fromList $ intOps ++ boolOps ++ strOps ++ logicalEqOps
                      
 
 

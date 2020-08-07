@@ -31,52 +31,18 @@ unitTests = testGroup "Unit Tests"
   [ testGroup "Operator Expressions"
       [ testGroup "Int Operator Expressions"
         $ buildTestCase intOpExpUnitTests
+      , testGroup "Bool Operator Expressions"
+        $ buildTestCase boolOpExpUnitTests
+      , testGroup "String Operator Expressions"
+        $ buildTestCase strOpExpUnitTests
+      , testGroup "Logical Operator Expressions"
+        $ buildTestCase logicOpExpUnitTests
       ]
   ]
   {-
-
- , testGroup "Bool Operator Expressions"
-        $ buildTestCase boolOpExpUnitTests
-      , testGroup "String Operator Expressions"
-        $ buildTestCase compOpExpUnitTests
-      , testGroup "Logical Operator Expressions"
-        $ buildTestCase compOpExpUnitTests
-   , testGroup "Assignment and Variable expression"
-   	  [ testGroup "Int Operator Expressions"
+  , testGroup "Assignment and Variable Expressions"
+        $ buildTestCase assignVarUnitTests
+  , testGroup "Table Manipulations"
         $ buildTestCase intOpExpUnitTests
-      , testGroup "Bool Operator Expressions"
-        $ buildTestCase boolOpExpUnitTests
-      , testGroup "Comp Operator Expressions"
-        $ buildTestCase compOpExpUnitTests
-      ]
+  ]
   -}
-
-
-{-
-  , testProperty
-    "Assignment and Variable Expressions"
-    $ forAll arbAssignVar anyCodeResult_prop
--}
-
-
-
-{-
-Constant Expressions
-Assignment Statement and Variable Expressions
-Binary Operation Expressions
-Unary Operation Expressions
-Table manipulations"
--}
-
-{-
-tests = testGroup "Property Tests"
-  [ testProperty
-    "Constant Expressions"
-    $ forAll arbConstExp anyExpVal_prop
-
-  , testProperty
-    "Variable Expressions"
-    $ forAll arbVarExp anyExpEnvVal_prop
-]
-
--}

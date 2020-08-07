@@ -132,14 +132,14 @@ unary operators (not   #     -     ~)
 -}
 --  
 -- fun should be Exp -> Exp -> Exp 
-binary  name fun assoc = Infix (do{ symbol name; return fun }) assoc
-prefix  name fun       = Prefix (do{ symbol name; return fun })
+binary  name fun assoc = Infix (do{ try (symbol name); return fun }) assoc
+prefix  name fun       = Prefix (do{ try (symbol name); return fun })
 table = [ [binary "^" (BinopExp "^") AssocRight]
         , [prefix op (UnopExp ("unop"++op)) | op <- ["not", "#", "-"]]
         , [binary op (BinopExp op) AssocLeft | op <- ["*","/","//","%"]]
         , [binary op (BinopExp op) AssocLeft | op <- ["+","-"]]
         , [binary ".." (BinopExp "..") AssocRight]
-        , [binary op (BinopExp op) AssocLeft | op <- ["<",">","<=",">=","~=","=="]]
+        , [binary op (BinopExp op) AssocLeft | op <- ["<=",">=","~=","==","<",">"]]
         , [binary "and" (BinopExp "and") AssocLeft]
         , [binary "or" (BinopExp "or") AssocLeft]]
 
