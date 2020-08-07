@@ -66,7 +66,7 @@ luaIneq v1 v2 = do v <- luaEq v1 v2
 
 
 {-
-logical operators not and or 
+logical operators not, and, or (arguments can be any value type)
 all logical operators consider both false and nil as false and anything else as true.
 -}
 --  The negation operator not always returns false or true. 
@@ -75,8 +75,8 @@ luaNot NilVal = return $ BoolVal True
 luaNot (BoolVal False) = return $ BoolVal True
 luaNot _ = return $ BoolVal False
 {-
-The conjunction operator 
- and returns its first argument if this value is false or nil; otherwise, and 
+The conjunction operator and (arguments can be any value type)
+returns its first argument if this value is false or nil; otherwise, and 
  returns its second argument. 
 -}
 luaAnd :: Val -> Val -> EvalState Val 
@@ -86,8 +86,10 @@ luaAnd _ v2 = return v2
 
 
 {-
-The disjunction operator or returns its first argument 
- if this value is different from nil and false; otherwise, or returns its second argument
+The disjunction operator or (arguments can be any value type)
+returns its first argument 
+ if this value is different from nil and false; 
+ otherwise, or returns its second argument
 -}
 luaOr :: Val -> Val -> EvalState Val 
 luaOr NilVal v2 = return v2
@@ -98,27 +100,38 @@ data PrimFunc = PrimUnop (Val -> EvalState Val) -- cannot be used as table index
                 | PrimBinop (Val -> Val -> EvalState Val) -- cannot be used as table index 
 
 type PrimFuncEnv = H.HashMap String PrimFunc 
+
+intOps :: [(String, PrimFunc)]
+intOps = [ ("^", PrimBinop $ liftIntBinop (^))
+         , ("unop-", PrimUnop $ liftIntUnop negate )
+         , ("*", PrimBinop $ liftIntBinop (*))
+         , ("/", PrimBinop $ liftIntBinop div)
+         , ("//", PrimBinop $ liftIntBinop div)  -- todo: doesnt support float, so both division perform the same 
+         , ("%", PrimBinop $ liftIntBinop mod)
+         , ("+", PrimBinop $ liftIntBinop (+))
+         , ("-", PrimBinop $ liftIntBinop (-))]
+
+boolOps ::[(String, PrimFunc)]
+boolOps = [ ("<", PrimBinop $ liftBoolBinop (<))
+          , (">", PrimBinop $ liftBoolBinop (>))
+          , ("<=", PrimBinop $ liftBoolBinop (<=))
+          , (">=", PrimBinop $ liftBoolBinop (>=))]
+                   
+strOps :: [(String, PrimFunc)]
+strOps = [ ("#", PrimUnop $ liftStrUnop length)
+         , ("..", PrimBinop luaConcat)]
+
+logicalEqOps :: [(String, PrimFunc)]
+logicalEqOps = [("not", PrimUnop luaNot)
+               , ("~=", PrimBinop luaIneq)
+               , ("==", PrimBinop luaEq)
+               , ("and", PrimBinop luaAnd)
+               , ("or", PrimBinop luaOr)]
+
+
 runtime :: PrimFuncEnv
 -- map (String : PrimBinop/PrimUnop)
-runtime = H.fromList [ ("^", PrimBinop $ liftIntBinop (^))
-                     , ("#", PrimUnop $ liftStrUnop length)
-                     , ("unop-", PrimUnop $ liftIntUnop negate )
-                     , ("*", PrimBinop $ liftIntBinop (*))
-                     , ("/", PrimBinop $ liftIntBinop div)
-                     , ("//", PrimBinop $ liftIntBinop div)  -- todo: doesnt support float, so both division perform the same 
-                     , ("%", PrimBinop $ liftIntBinop mod)
-                     , ("+", PrimBinop $ liftIntBinop (+))
-                     , ("-", PrimBinop $ liftIntBinop (-))
-                     , ("<", PrimBinop $ liftBoolBinop (<))
-                     , (">", PrimBinop $ liftBoolBinop (>))
-                     , ("<=", PrimBinop $ liftBoolBinop (<=))
-                     , (">=", PrimBinop $ liftBoolBinop (>=))
-                     , ("not", PrimUnop luaNot)
-                     , ("..", PrimBinop luaConcat) 
-                     , ("~=", PrimBinop luaIneq)
-                     , ("==", PrimBinop luaEq)
-                     , ("and", PrimBinop luaAnd)
-                     , ("or", PrimBinop luaOr)]
+runtime = H.fromList $ intOps ++ boolOps ++ logicalEqOps
                      
 
 

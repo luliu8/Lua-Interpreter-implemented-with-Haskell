@@ -6,20 +6,16 @@ import qualified Data.HashMap.Strict as H
 import Control.Monad.State
 import Lua.Eval
 import Lua.Parse
+import Lua.Runtime 
 
--- import System.Process
 import Text.ParserCombinators.Parsec hiding (Parser, State)
 
-{-
-main = do output <- readProcess "lua" ["-e", "do a = 10; print (a) end"] ""
-          print $output
--}
+
 
 data CodeResultUnit = CodeResultUnit String String 
   deriving(Show, Eq) 
 
 
--- the output string from my exec should match that of reference lua interpreter 
 anyCodeResult_prop :: CodeResultUnit -> Property
 anyCodeResult_prop (CodeResultUnit code result)
     = showFailure $ actualResult === result
@@ -35,14 +31,7 @@ anyCodeResult_prop (CodeResultUnit code result)
 
 
 
-
--- ### constant expressions 
--- e.g. print ("abc") , print (true), print(3) 
-
---do print ("abc"); print(123); print(true) end 
-
-
--- constant expressions : nil, true/false, int, String 
+-- ### constant expressions : nil, true/false, int, String 
 arbInt :: Gen CodeResultUnit 
 arbInt = do int <- arbitrary :: Gen Int
             let code = "print ("++ show int ++ ")"
@@ -61,20 +50,12 @@ arbNilBool = do x <- elements ["nil", "true", "false"]
 arbConst :: Gen CodeResultUnit
 arbConst = oneof [arbInt, arbString, arbNilBool]
 
+-- ### runtime operators 
+
+
 --- ### assignment statement and variable expressions 
 -- e.g. do a,b,c = 10,20,30; print(a); print(b); print (c) end
 -- arbAssignVar :: Gen CodeResultUnit
-
-
-
-
--- ### Binary operations 
-
-
-
---- ### Unary operations 
--- print (-10)
-
 
 
 --- ### Table manipulations 
